@@ -1,64 +1,53 @@
 #pragma once
 
-#include  "mysql.h"
-#include  "MySQLConnection.h"
-#include  "MySQLConnectorStructs.h"
-#include  "Kismet/BlueprintFunctionLibrary.h"
+#include "mysql.h"
+#include "MySQLConnection.h"
+#include "MySQLConnectorStructs.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "Engine.h"
 #include "MySQLDatabase.generated.h"
 
 
 USTRUCT(BlueprintType)
-struct UE4MYSQL_API FMySQLConnectorConnectionStruct
-{
-	GENERATED_USTRUCT_BODY()
-
-		/** The database name (not the filename) */
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Database Reference")
-		UMySQLConnection* conn;
-
-};
-
-USTRUCT(BlueprintType)
 struct UE4MYSQL_API FMySQLConnectorKeyValuePair
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
-		/** The database table field name */
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Key Value Pair")
-		FString Key;
+	/** The database table field name */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Key Value Pair")
+	FString Key;
 
 	/** The value of the field */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Key Value Pair")
-		FString Value;
+	FString Value;
 };
 
 USTRUCT(BlueprintType)
 struct UE4MYSQL_API FMySQLConnectorQueryResultRow
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
-		/** A list of field name, field value pairs */
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Query Result")
-		TArray<FMySQLConnectorKeyValuePair> Fields;
+	/** A list of field name, field value pairs */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Query Result")
+	TArray<FMySQLConnectorKeyValuePair> Fields;
 };
 
 USTRUCT(BlueprintType)
 struct UE4MYSQL_API FMySQLConnectoreQueryResult
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
-		/** The resulting rows from the query */
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Query Result")
-		TArray<FMySQLConnectorQueryResultRow> ResultRows;
+	/** The resulting rows from the query */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Query Result")
+	TArray<FMySQLConnectorQueryResultRow> ResultRows;
 
 	/** Was the query successful or not */
 	UPROPERTY(BlueprintReadOnly, Category = "MySQLConnector Query Result")
-		bool Success;
+	bool Success;
 
 	/** If the query was unsuccessful a human readable error message will be populated here */
 	UPROPERTY(BlueprintReadOnly, Category = "MySQLConnector Query Result")
-		FString ErrorMessage;
+	FString ErrorMessage;
 
 };
 
