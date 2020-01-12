@@ -9,7 +9,7 @@
 
 
 USTRUCT(BlueprintType)
-struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorConnectionStruct
+struct UE4MYSQL_API FMySQLConnectorConnectionStruct
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -20,7 +20,7 @@ struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorConnectionStruct
 };
 
 USTRUCT(BlueprintType)
-struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorKeyValuePair
+struct UE4MYSQL_API FMySQLConnectorKeyValuePair
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -34,7 +34,7 @@ struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorKeyValuePair
 };
 
 USTRUCT(BlueprintType)
-struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorQueryResultRow
+struct UE4MYSQL_API FMySQLConnectorQueryResultRow
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -44,7 +44,7 @@ struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorQueryResultRow
 };
 
 USTRUCT(BlueprintType)
-struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectoreQueryResult
+struct UE4MYSQL_API FMySQLConnectoreQueryResult
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -118,7 +118,7 @@ struct MySQLConnectorQueryResult
 * MySQLConnector main database class.
 */
 UCLASS()
-class MYSQLCONNECTORUE4PLUGIN_API UMySQLDatabase : public UObject
+class UE4MYSQL_API UMySQLDatabase : public UObject
 {
 	GENERATED_UCLASS_BODY()
 

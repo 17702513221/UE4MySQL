@@ -8,7 +8,7 @@
 * SQLite main database class.
 */
 UCLASS()
-class MYSQLCONNECTORUE4PLUGIN_API UMySQLConnection : public UObject
+class UE4MYSQL_API UMySQLConnection : public UObject
 {
 	GENERATED_UCLASS_BODY()    
 

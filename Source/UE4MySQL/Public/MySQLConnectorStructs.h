@@ -3,7 +3,7 @@
 #include "MySQLConnectorStructs.generated.h"
 
 USTRUCT(BlueprintType)
-struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorTableField
+struct UE4MYSQL_API FMySQLConnectorTableField
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -26,7 +26,7 @@ struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorTableField
 };
 
 USTRUCT(BlueprintType)
-struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorPrimaryKey
+struct UE4MYSQL_API FMySQLConnectorPrimaryKey
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -36,7 +36,7 @@ struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorPrimaryKey
 };
 
 USTRUCT(BlueprintType)
-struct MYSQLCONNECTORUE4PLUGIN_API FMySQLConnectorTable
+struct UE4MYSQL_API FMySQLConnectorTable
 {
 	GENERATED_USTRUCT_BODY()
 

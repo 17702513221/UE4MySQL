@@ -1,5 +1,5 @@
 #include "MySQLDatabase.h"
-#include "MySQLConnectorUE4Plugin.h"
+#include "UE4MySQL.h"
 #include <string>
 #include "Engine.h"
 
@@ -263,7 +263,12 @@ bool UMySQLDatabase::MySQLConnectorGetPlayerControllerIP(FString& IP, int32& IP_
 		if (connection)
 		{
 			IP = connection->LowLevelGetRemoteAddress(false);
-			IP_int = connection->GetAddrAsInt();
+			// IP_int = connection->GetAddrAsInt();
+			// Simple fix for 4.24
+			uint32 tmpIP;
+			connection->GetRemoteAddr().Get()->GetIp(tmpIP);
+			IP_int = tmpIP;
+
 			return true;
 		}
 	}

@@ -1,5 +1,5 @@
 #include "MySQLConnection.h"
-#include "MySQLConnectorUE4Plugin.h"
+#include "UE4MySQL.h"
 
 
 UMySQLConnection::UMySQLConnection(const FObjectInitializer& ObjectInitializer)

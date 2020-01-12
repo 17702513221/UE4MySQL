@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class MySQLConnectorUE4Plugin : ModuleRules
+public class UE4MySQL : ModuleRules
 {
-	public MySQLConnectorUE4Plugin(ReadOnlyTargetRules Target) : base(Target)
+	public UE4MySQL(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
