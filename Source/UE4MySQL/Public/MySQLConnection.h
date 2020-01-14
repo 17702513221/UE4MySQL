@@ -4,23 +4,37 @@
 
 #include "MySQLConnection.generated.h"
 
-/**
-* SQLite main database class.
-*/
+
 UCLASS()
-class UE4MYSQL_API UMySQLConnection : public UObject
+class UE4MYSQL_API UMySQLConnection final : public UObject
 {
-	GENERATED_UCLASS_BODY()    
+	GENERATED_BODY()
+
+	MYSQL* m_MySQLConnection;
 
 public:
 
-    MYSQL* globalCon = nullptr;
-   
-    UFUNCTION(BlueprintCallable, Category = "MySQLConnector|Connection")
-		bool MySQLCheckConnection();
+	UMySQLConnection(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {}
 
-	// checks if the connection is valid and closes it, resets the pointers to nullptr on success
-	// true on success, false in case the connection is not established or the argument is nullptr
-	UFUNCTION(BlueprintCallable, Category = "MySQLConnector|Connection")
+	/** Is the connection connected? */
+	UFUNCTION(BlueprintPure, Category = "UE4MySQL")
+	bool IsConnected();
+
+	/** Get the connection. */
+	FORCEINLINE MYSQL* GetConnection() const { return m_MySQLConnection; }
+
+	/** Set the connection. */
+	void SetConnection(MYSQL* NewConnection) { m_MySQLConnection = NewConnection; }
+
+	/**
+	 * Close a MYSQL connection
+	 * 
+	 * @param UMySQLConnection * Connection The connection that should be closed.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "UE4MySQL", meta = (DisplayName = "MySQL Close Connection"))
 	static bool MySQLCloseConnection(UMySQLConnection* Connection);
+
+	UFUNCTION(BlueprintCallable, Category = "UE4MySQL", meta = (DisplayName = "MySQL Init Connection"))
+	static UMySQLConnection* MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName);
+
 };

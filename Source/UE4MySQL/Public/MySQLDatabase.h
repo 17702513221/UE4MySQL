@@ -107,15 +107,13 @@ struct MySQLConnectorQueryResult
 * MySQLConnector main database class.
 */
 UCLASS()
-class UE4MYSQL_API UMySQLDatabase : public UObject
+class UE4MYSQL_API UMySQLDatabase final : public UObject
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "MySQLConnector")
-		static UMySQLConnection* MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName);
-
+	UMySQLDatabase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {}
 
 	UFUNCTION(BlueprintCallable, Category = "MySQLConnector|Query")
 		static bool MySQLConnectorExecuteQuery(FString Query, UMySQLConnection* Connection);
@@ -130,15 +128,13 @@ public:
 
 	/** Create table in the database. */
 	UFUNCTION(BlueprintCallable, Category = "MySQLConnector|Query", meta = (DisplayName = "Create Table"))
-		static FMySQLConnectorTable CreateTable(const FString TableName,
-			const TArray<FMySQLConnectorTableField> Fields, UMySQLConnection* Connection);
+		static FMySQLConnectorTable CreateTable(const FString TableName, const TArray<FMySQLConnectorTableField> Fields, UMySQLConnection* Connection);
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "INT (MySQLConnector)"), Category = "MySQLConnector|Query|DataTypes")
 		static FMySQLConnectorTableField MySQLConnectorINT(FString FieldName, const bool PK, const bool AI);
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "VARCHAR (MySQLConnector)"), Category = "MySQLConnector|Query|DataTypes")
-		static FMySQLConnectorTableField MySQLConnectorVARCHAR(const FString FieldName, const FString FieldLength,
-			const bool PK, const bool Unique, const bool NotNull);
+		static FMySQLConnectorTableField MySQLConnectorVARCHAR(const FString FieldName, const FString FieldLength, const bool PK, const bool Unique, const bool NotNull);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "InsertTest"), Category = "MySQLConnector|Query")
 		static bool MySQLConnectorInsertTest(const FString Query, UMySQLConnection* Connection);
@@ -154,8 +150,4 @@ public:
 private:
 	/** Runs a query and returns fetched rows. */
 	static MySQLConnectorQueryResult RunQueryAndGetResults(FString Query, UMySQLConnection* Connection);
-
-
-
-
 };

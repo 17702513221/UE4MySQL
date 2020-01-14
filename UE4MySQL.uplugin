@@ -13,7 +13,11 @@
         {
             "Name" : "UE4MySQL",
             "Type" : "Runtime",
-			      "LoadingPhase" : "PreDefault"
+            "LoadingPhase" : "PreDefault",
+            "WhitelistPlatforms": [
+				"Win64",
+				"Win32"
+			]
         } 
     ]
 }

@@ -3,59 +3,6 @@
 #include <string>
 #include "Engine.h"
 
-UMySQLDatabase::UMySQLDatabase(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
-{
-}
-
-UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName)
-{
-	std::string HostString(TCHAR_TO_UTF8(*Host));
-	std::string UserNameString(TCHAR_TO_UTF8(*UserName));
-	std::string UserPasswordString(TCHAR_TO_UTF8(*UserPassword));
-	std::string DatabaseNameString(TCHAR_TO_UTF8(*DatabaseName));
-
-	UMySQLConnection* cs = NewObject<UMySQLConnection>();
-
-	if (mysql_library_init(0, nullptr, nullptr) != 0)
-	{
-		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: FAILED TO INIT mysql library"));
-		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("FAILED TO INIT mysql library"));
-		mysql_library_end();
-		return nullptr;
-	}
-
-	cs->globalCon = mysql_init(nullptr);
-	if (!cs->globalCon)
-	{
-		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: FAILED TO INIT connection"));
-		mysql_library_end();
-		return nullptr;
-	}
-
-	if (!mysql_real_connect(cs->globalCon,
-	                        HostString.c_str(),
-	                        UserNameString.c_str(),
-	                        UserPasswordString.c_str(),
-	                        DatabaseNameString.c_str(),
-	                        0, nullptr, 0))
-	{
-		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: Failed to Connect to Database!"));
-		UMySQLConnection::MySQLCloseConnection(cs);
-		return nullptr;
-	}
-
-	if (mysql_set_character_set(cs->globalCon, "utf8") != 0)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set UTF-8 with mysql_set_character_set"));
-		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: Can't set UTF-8 with mysql_set_character_set"));
-		UMySQLConnection::MySQLCloseConnection(cs);
-		return nullptr;
-	}
-
-	return cs;
-}
-
 bool UMySQLDatabase::MySQLConnectorExecuteQuery(FString Query, UMySQLConnection* Connection)
 {
 	/*	FString qwe = "";
@@ -64,16 +11,15 @@ bool UMySQLDatabase::MySQLConnectorExecuteQuery(FString Query, UMySQLConnection*
 		qwe = qwe + TEXT("');");*/
 
 
-	if (!Connection || !Connection->globalCon)
+	if (Connection == nullptr || !Connection->IsConnected())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Connection is NULL!"));
 		return false;
-	};
+	}
 
 	std::string MyStdString(TCHAR_TO_UTF8(*Query));
 
 	//if (mysql_query(con, "INSERT INTO `test`.`t1` (`Qwe`) VALUES ('Привет ');")) {
-	if (mysql_query(Connection->globalCon, MyStdString.c_str()))
+	if (mysql_query(Connection->GetConnection(), MyStdString.c_str()))
 	{
 		return false;
 	}
@@ -82,19 +28,12 @@ bool UMySQLDatabase::MySQLConnectorExecuteQuery(FString Query, UMySQLConnection*
 
 bool UMySQLDatabase::DropTable(const FString TableName, UMySQLConnection* Connection)
 {
-	if (!Connection)
+	if (Connection == nullptr || !Connection->IsConnected())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Connection is NULL!"));
 		return false;
-	};
+	}
 
-	bool idxCrSts = true;
-
-	FString Query = "DROP TABLE " + TableName;
-
-	idxCrSts = MySQLConnectorExecuteQuery(Query, Connection);
-
-	return idxCrSts;
+	return MySQLConnectorExecuteQuery("DROP TABLE " + TableName, Connection);
 }
 
 bool UMySQLDatabase::TruncateTable(const FString TableName, UMySQLConnection* Connection)
@@ -118,22 +57,20 @@ bool UMySQLDatabase::TruncateTable(const FString TableName, UMySQLConnection* Co
 }
 
 
-FMySQLConnectorTable UMySQLDatabase::CreateTable(const FString TableName,
-                                                 const TArray<FMySQLConnectorTableField> Fields, UMySQLConnection* Connection)
+FMySQLConnectorTable UMySQLDatabase::CreateTable(const FString TableName, const TArray<FMySQLConnectorTableField> Fields, UMySQLConnection* Connection)
 {
 	/*CREATE TABLE `test`.`new_table` (
 		`id` INT NOT NULL AUTO_INCREMENT,
 		`q` VARCHAR(45) NOT NULL,
 		PRIMARY KEY(`id`));*/
 
-	FMySQLConnectorTable t;
 
-	if (!Connection || !Connection->MySQLCheckConnection())
+	if (Connection == nullptr || !Connection->IsConnected())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Not connected or Connection is NULL!"));
-		return t;
-	};
+		return FMySQLConnectorTable();
+	}
 
+	FMySQLConnectorTable t;
 	t.DatabaseName = TEXT("");
 	t.TableName = TableName;
 	t.Fields = Fields;
@@ -184,6 +121,7 @@ FMySQLConnectorTableField UMySQLDatabase::MySQLConnectorINT(const FString FieldN
 			`q` VARCHAR(45) NOT NULL
 			);*/
 
+
 	FMySQLConnectorTableField f;
 	f.FieldType = "INT";
 	f.FieldName = FieldName;
@@ -204,8 +142,7 @@ FMySQLConnectorTableField UMySQLDatabase::MySQLConnectorINT(const FString FieldN
 	return f;
 }
 
-FMySQLConnectorTableField UMySQLDatabase::MySQLConnectorVARCHAR(const FString FieldName, const FString FieldLength,
-                                                                const bool PK, const bool Unique, const bool NotNull)
+FMySQLConnectorTableField UMySQLDatabase::MySQLConnectorVARCHAR(const FString FieldName, const FString FieldLength, const bool PK, const bool Unique, const bool NotNull)
 {
 	/*
 	CREATE TABLE `test`.`new_table` (
@@ -290,7 +227,7 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 		return resultOutput;
 	};
 
-	if (!Connection->MySQLCheckConnection())
+	if (!Connection->IsConnected())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Not connected!"));
 		resultOutput.ErrorMessage = "Not connected!";
@@ -304,12 +241,12 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 
 	std::string MyStdString(TCHAR_TO_UTF8(*Query));
 
-	if (mysql_query(Connection->globalCon, MyStdString.c_str())) // "SELECT * FROM Cars"
+	if (mysql_query(Connection->GetConnection(), MyStdString.c_str())) // "SELECT * FROM Cars"
 	{
 		//finish_with_error(con);
 	}
 
-	MYSQL_RES* result = mysql_store_result(Connection->globalCon);
+	MYSQL_RES* result = mysql_store_result(Connection->GetConnection());
 
 	if (!result)
 	{
@@ -346,7 +283,7 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 	TArray<MySQLConnectorResultValue> resultRows;
 
 	MYSQL_ROW row;
-	while ((row = mysql_fetch_row(result)))
+	while (row = mysql_fetch_row(result))
 	{
 		MySQLConnectorResultValue rowVal;
 
@@ -401,7 +338,7 @@ FMySQLConnectoreQueryResult UMySQLDatabase::MySQLConnectorGetData(const FString&
 	//////////////////////////////////////////////////////////////////////////
 	// Get the results
 	//////////////////////////////////////////////////////////////////////////
-	if (!Connection || !Connection->MySQLCheckConnection())
+	if (!Connection || !Connection->IsConnected())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Not connected or Connection is NULL!"));
 		result.ErrorMessage = "Not connected or Connection is NULL!";
